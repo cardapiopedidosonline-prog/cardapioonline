@@ -108,15 +108,38 @@
 <body>
 
 <header>
-    <h1>Painel de Cadastros e Pedidos</h1>
+    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+        <h1>Painel Admin</h1>
+        <div id="status-loja-container" style="display: flex; align-items: center; gap: 10px; background: #1e293b; padding: 5px 15px; border-radius: 50px; border: 1px solid #334155;">
+            <span id="label-status" style="color: #94a3b8; font-weight: bold; font-size: 0.8rem;">LOJA FECHADA</span>
+            <input type="checkbox" id="check-status-loja" onchange="window.toggleStatusLoja()" style="width: 20px; height: 20px; cursor: pointer;">
+        </div>
+    </div>
     <div class="nav-admin">
         <button onclick="alternarTela('produtos')" class="btn-nav">Produtos</button>
         <button onclick="alternarTela('pedidos')" class="btn-nav">
             Pedidos <span id="badge-pedidos" class="badge-alerta"></span>
         </button>
+        <button onclick="alternarTela('relatorios')" class="btn-nav">Faturamento</button>
     </div>
     <a href="index.html" class="btn-ver-loja">Ver Cardápio</a>
 </header>
+
+<section id="tela-relatorios" style="display: none;">
+    <div class="card">
+        <h2>📊 Resumo de Faturamento</h2>
+        <div id="resumo-financeiro" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px;">
+            <div style="background: #0f172a; padding: 20px; border-radius: 10px; border-left: 4px solid #10b981;">
+                <span style="color: #94a3b8; font-size: 0.8rem;">HOJE</span>
+                <h3 id="total-hoje" style="color: #10b981; margin: 5px 0;">R$ 0,00</h3>
+            </div>
+            <div style="background: #0f172a; padding: 20px; border-radius: 10px; border-left: 4px solid #3b82f6;">
+                <span style="color: #94a3b8; font-size: 0.8rem;">TOTAL (GERAL)</span>
+                <h3 id="total-geral" style="color: #3b82f6; margin: 5px 0;">R$ 0,00</h3>
+            </div>
+        </div>
+    </div>
+</section>
 
 <main class="container">
     <section id="tela-produtos">
