@@ -3,21 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cardápio Digital - Burguer Mania</title>
+    <title>Cardápio Digital - Santo Lanche's</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        /* CSS Rápido para o Modal de Aviso (Caso não esteja no seu style.css) */
+        .modal-personalizado {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); display: flex; align-items: center;
+            justify-content: center; z-index: 9999; padding: 20px;
+        }
+        .modal-conteudo-dark {
+            background: #1e293b; border-radius: 20px; max-width: 400px;
+            width: 100%; border: 1px solid #334155; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5);
+        }
+        .btn-salvar-dark {
+            background: #3b82f6; color: white; border: none; padding: 12px 30px;
+            border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%;
+        }
+    </style>
 </head>
 <body>
 
     <header class="loja-header">
-       <img src="logo.png" alt="Logo Burguer Mania" class="logo-img">
-    <h1 class="titulo-cardapio">CARDÁPIO</h1>
-    <p class="boas-vindas"> Seja bem-vindo ao Santo Lanche's! Difícil vai ser não pedir de novo.</p>
-    <div class="redes-sociais">
-        <a href="https://instagram.com/seuperfil" target="_blank"><span>🅾</span> @Cardapio_teste</a>
-        <a href="https://wa.me/5538988287076" target="_blank"><span>✆</span> WhatsApp</a>
-    </div>
-       
+       <img src="logo.png" alt="Logo Santo Lanche's" class="logo-img">
+       <h1 class="titulo-cardapio">CARDÁPIO</h1>
+       <p class="boas-vindas"> Seja bem-vindo ao Santo Lanche's! Difícil vai ser não pedir de novo.</p>
+       <div class="redes-sociais">
+           <a href="https://instagram.com/bulim_lanches/" target="_blank"><span>🅾</span> @bulim_lanches</a>
+           <a href="https://wa.me/5538999586605" target="_blank"><span>✆</span> WhatsApp</a>
+       </div>
     </header>
 
     <nav class="categorias" id="categorias-nav"></nav>
@@ -57,28 +72,26 @@
                 <label>Forma de Pagamento:</label>
                 <select id="pagamento">
                     <option value="">Selecione...</option>
-                    <option value="pix">Pix ❖</option>
-                    <option value="Cartão">Cartão ▬ </option>
-                    <option value="Dinheiro">Dinheiro ⛀</option>
+                    <option value="pix">Pix: ❖</option>
+                    <option value="Cartão">Cartão: ▰ </option>
+                    <option value="Dinheiro">Dinheiro: [̲̅R$]</option>
                 </select>
             </div>
 
             <div id="area-pix" style="display: none; background: #e0f2fe; padding: 15px; border-radius: 12px; margin-top: 10px; border: 1px solid #7dd3fc;">
                 <p style="margin: 0; font-size: 0.8rem; color: #0369a1; font-weight: bold;">Chave PIX (Copia e Cola):</p>
                 <code style="display: block; background: white; padding: 8px; margin: 8px 0; border-radius: 6px; font-size: 0.75rem; border: 1px dashed #7dd3fc; text-align: center;">seu-email-ou-cpf@pix.com</code>
-                <small style="color: #0c4a6e; font-size: 0.7rem; display: block; text-align: center;">Titular: Burguer Mania Ltda</small>
+                <small style="color: #0c4a6e; font-size: 0.7rem; display: block; text-align: center;">Titular: Santo Lanche's</small>
             </div>
 
             <div class="form-group" style="margin-top: 15px;">
                 <label>Observações do Pedido:</label>
-                <textarea id="cliente-obs" 
-                    placeholder="Ex: Sem cebola, tirar tomate..." rows="3" 
-                    style="width: 100%; border-radius: 8px; border: 1px solid #ddd; padding: 10px; font-family: inherit; box-sizing: border-box;"></textarea>
+                <textarea id="cliente-obs" placeholder="Ex: Sem cebola, tirar tomate..." rows="3" style="width: 100%; border-radius: 8px; border: 1px solid #ddd; padding: 10px; font-family: inherit; box-sizing: border-box;"></textarea>
             </div>
 
             <div class="modal-actions" style="margin-top: 20px; display: flex; gap: 10px;">
                 <button onclick="fecharModal()" class="btn-cancelar" style="flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #ddd; cursor: pointer;">Voltar</button>
-                <button onclick="confirmarPedido()" class="btn-confirmar" style="flex: 2; padding: 12px; border-radius: 8px; background: #25d366; color: white; border: none; font-weight: 700; cursor: pointer;">Enviar Pedido </button>
+                <button id="btn-confirmar-pedido" onclick="confirmarPedido()" class="btn-confirmar" style="flex: 2; padding: 12px; border-radius: 8px; background: #25d366; color: white; border: none; font-weight: 700; cursor: pointer;">Enviar Pedido </button>
             </div>
         </div>
     </div>
@@ -89,6 +102,15 @@
             <span id="valor-total">R$ 0,00</span>
         </div>
         <button id="finalizar-btn" onclick="abrirModal()">Ver Carrinho</button>
+    </div>
+
+    <div id="modal-aviso-cliente" class="modal-personalizado" style="display: none;">
+        <div class="modal-conteudo-dark" style="text-align: center; padding: 30px;">
+            <div id="icone-aviso" style="font-size: 50px; margin-bottom: 15px;">⚠️</div>
+            <h3 id="titulo-aviso" style="color: #f8fafc; margin-bottom: 10px;">Aviso</h3>
+            <p id="texto-aviso" style="color: #94a3b8; line-height: 1.5; margin-bottom: 25px;"></p>
+            <button class="btn-salvar-dark" onclick="fecharModalAviso()">Entendi</button>
+        </div>
     </div>
 
     <script type="module" src="script.js"></script>
