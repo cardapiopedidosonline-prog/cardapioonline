@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, onSnapshot, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyCSrf2LUF40Oyrt0WMtJCYX-vN5STU5i2g",
@@ -15,6 +15,7 @@ const db = getFirestore(app);
 
 let carrinho = [];
 let produtosLoja = [];
+let lojaEstaAbertaNoMomento = true;
 
 const dadosPix = {
     chave: "seu-email-ou-cpf@pix.com",
@@ -22,7 +23,67 @@ const dadosPix = {
     cidade: "Diamantina"
 };
 
-// --- ESCUTA O CARDÁPIO ONLINE ---
+// --- 1. FUNÇÕES DE INTERFACE (MODAIS) ---
+window.mostrarAviso = function(titulo, mensagem, icone = '⚠️') {
+    const modal = document.getElementById('modal-aviso-cliente');
+    if (modal) {
+        document.getElementById('titulo-aviso').innerText = titulo;
+        document.getElementById('texto-aviso').innerText = mensagem;
+        document.getElementById('icone-aviso').innerText = icone;
+        modal.style.display = 'flex';
+    } else {
+        // Fallback caso o modal não exista no HTML ainda
+        alert(`${icone} ${titulo}: ${mensagem}`);
+    }
+};
+
+window.fecharModalAviso = function() {
+    document.getElementById('modal-aviso-cliente').style.display = 'none';
+};
+
+window.abrirModal = function() {
+    if (carrinho.length === 0) {
+        window.mostrarAviso("Carrinho Vazio", "Adicione pelo menos um item para continuar.", "🛒");
+        return;
+    }
+    const modal = document.getElementById('modal-checkout');
+    if(modal) modal.style.display = 'block';
+};
+
+window.fecharModal = function() {
+    const modal = document.getElementById('modal-checkout');
+    if(modal) modal.style.display = 'none';
+};
+
+// --- 2. ESCUTA STATUS DA LOJA ---
+onSnapshot(doc(db, "configuracoes", "status"), (docSnap) => {
+    if (docSnap.exists()) {
+        lojaEstaAbertaNoMomento = docSnap.data().aberta;
+        const btnConfirmar = document.getElementById('btn-confirmar-pedido');
+        
+        if (!lojaEstaAbertaNoMomento) {
+            if(btnConfirmar) {
+                btnConfirmar.disabled = true;
+                btnConfirmar.innerText = "LOJA FECHADA ❌";
+                btnConfirmar.style.backgroundColor = "#64748b";
+                btnConfirmar.style.cursor = "not-allowed";
+            }
+            document.body.style.filter = "grayscale(0.8)";
+            // Avisa o cliente assim que a loja fecha
+            window.mostrarAviso("Loja Fechada", "Caro cliente! Informamos que nosso expediente se encontra ecerrado.", "⋆｡ ﾟ☁︎｡ ⋆｡ ﾟ☾ ﾟ｡ ⋆");
+        } else {
+            if(btnConfirmar) {
+                btnConfirmar.disabled = false;
+                btnConfirmar.innerText = "CONFIRMAR PEDIDO ✔️";
+                btnConfirmar.style.backgroundColor = "#10b981";
+                btnConfirmar.style.cursor = "pointer";
+            }
+            document.body.style.filter = "none";
+        }
+    }
+});
+
+// --- 3. GESTÃO DO CARDÁPIO ---
 onSnapshot(collection(db, "produtosCardapio"), (snapshot) => {
     produtosLoja = [];
     snapshot.forEach(doc => {
@@ -36,103 +97,104 @@ function carregarCardapio() {
     if (!container) return;
     
     if (produtosLoja.length === 0) {
-        container.innerHTML = "<p style='text-align:center; grid-column: 1/-1;'>Carregando produtos...</p>";
+        container.innerHTML = "<p style='text-align:center; grid-column: 1/-1; color: white;'>Carregando delícias...</p>";
         return;
     }
 
-    // Ordena para que os itens em promoção apareçam primeiro (no topo)
     const produtosOrdenados = [...produtosLoja].sort((a, b) => {
         return (b.emPromocao === true ? 1 : 0) - (a.emPromocao === true ? 1 : 0);
     });
 
     container.innerHTML = produtosOrdenados.map(p => {
-        // Estilo especial se estiver em promoção
         const estiloPromo = p.emPromocao 
             ? 'border: 2px solid #f59e0b; background-color: #fffbeb; position: relative;' 
-            : '';
+            : 'background-color: white;';
             
         const seloPromo = p.emPromocao 
             ? `<span style="background: #f59e0b; color: white; padding: 2px 8px; border-radius: 50px; font-size: 0.7rem; font-weight: bold; display: inline-block; margin-bottom: 5px;">PROMOÇÃO 🔥</span>` 
             : '';
 
         return `
-            <div class="produto" style="${estiloPromo}">
-                <div class="prod-info">
+            <div class="produto" style="${estiloPromo} padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; color: #1e293b;">
+                <div class="prod-info" style="flex: 1;">
                     ${seloPromo}
-                    <h3>${p.nome}</h3>
-                    <p>${p.desc || 'Delicioso hambúrguer artesanal'}</p>
-                    <span>R$ ${parseFloat(p.preco).toFixed(2)}</span>
+                    <h3 style="margin: 0; color: #0f172a;">${p.nome}</h3>
+                    <p style="font-size: 0.9rem; color: #64748b; margin: 5px 0;">${p.desc || 'Hambúrguer artesanal fresquinho'}</p>
+                    <span style="font-weight: bold; color: #10b981; font-size: 1.1rem;">R$ ${parseFloat(p.preco).toFixed(2)}</span>
                 </div>
-                <button onclick="adicionarAoCarrinho('${p.nome}', ${p.preco})">
-                    Adicionar
+                <button onclick="adicionarAoCarrinho('${p.nome}', ${p.preco})" style="background: #ef4444; color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-left: 10px;">
+                    +
                 </button>
             </div>
         `;
     }).join('');
 }
 
+// --- 4. CARRINHO E PEDIDO ---
 window.adicionarAoCarrinho = function(nome, preco) {
+    if (!lojaEstaAbertaNoMomento) {
+        window.mostrarAviso("Expediênte Encerrado!", "Não é possível adicionar itens.", "⋆｡ﾟ☁︎｡⋆｡ ﾟ☾ ﾟ｡⋆");
+        return;
+    }
     carrinho.push({ nome, preco });
     document.getElementById('qtd-itens').innerText = `${carrinho.length} Itens`;
     const total = carrinho.reduce((sum, i) => sum + i.preco, 0);
     document.getElementById('valor-total').innerText = `R$ ${total.toFixed(2)}`;
-}
-
-window.abrirModal = function() {
-    if (carrinho.length === 0) return alert("Carrinho vazio!");
-    document.getElementById('modal-checkout').style.display = 'block';
-}
-
-window.fecharModal = function() {
-    document.getElementById('modal-checkout').style.display = 'none';
-}
-
-window.toggleEndereco = function() {
-    const tipo = document.getElementById('tipo-entrega').value;
-    const secao = document.getElementById('secao-endereco');
-    if(secao) {
-        secao.style.display = tipo === 'entrega' ? 'block' : 'none';
-    }
-}
-
-window.gerenciarPagamentoPix = function() {
-    const formaPagamento = document.getElementById('pagamento').value;
-    const areaPix = document.getElementById('area-pix');
-    
-    if (formaPagamento === 'pix') {
-        alert(`📌 DADOS PARA PAGAMENTO PIX\n\nChave: ${dadosPix.chave}\nNome: ${dadosPix.nome}\n\nFavor enviar o comprovante pelo WhatsApp após finalizar!`);
-        if(areaPix) areaPix.style.display = 'block';
-    } else {
-        if(areaPix) areaPix.style.display = 'none';
-    }
-}
+};
 
 window.confirmarPedido = async function() {
-    const nome = document.getElementById('cliente-nome').value;
-    const fone = document.getElementById('cliente-fone').value;
-    const tipoEntrega = document.getElementById('tipo-entrega').value;
-    const endereco = document.getElementById('cliente-endereco').value;
-    const formaPagamento = document.getElementById('pagamento').value;
-    const observacao = document.getElementById('cliente-obs').value;
+    if (!lojaEstaAbertaNoMomento) {
+        window.mostrarAviso("Encerrado", "A loja acabou de fechar! Não conseguimos processar seu pedido agora.", "🚫");
+        window.fecharModal();
+        return; 
+    }
     
-    if (!nome || !fone) return alert("Preencha nome e WhatsApp!");
-    if (tipoEntrega === 'entrega' && !endereco) return alert("Informe o endereço!");
+    // Captura dos campos
+    const nome = document.getElementById('cliente-nome').value.trim();
+    const fone = document.getElementById('cliente-fone').value.trim();
+    const tipoEntrega = document.getElementById('tipo-entrega').value;
+    const endereco = document.getElementById('cliente-endereco').value.trim();
+    const formaPagamento = document.getElementById('pagamento').value;
+    const observacao = document.getElementById('cliente-obs').value.trim();
+    
+    // --- VALIDAÇÃO DE CAMPOS OBRIGATÓRIOS ---
+    if (!nome) return window.mostrarAviso("Campo Obrigatório", "Por favor, digite seu nome.", "👤");
+    if (!fone) return window.mostrarAviso("Campo Obrigatório", "Informe seu WhatsApp para contato.", "📞");
+    if (tipoEntrega === 'entrega' && !endereco) {
+        return window.mostrarAviso("Endereço Faltando", "Para entregas, precisamos do seu endereço completo.", "📍");
+    }
+    if (!formaPagamento) return window.mostrarAviso("Pagamento", "Escolha como deseja pagar o seu pedido.", "💳");
 
     const totalCarrinho = carrinho.reduce((sum, i) => sum + i.preco, 0);
     const pedidoId = Date.now();
     const numeroPedido = pedidoId.toString().slice(-4);
 
+    // --- MONTAGEM DA MENSAGEM ESTILO CUPOM (WHATSAPP) ---
     let msgWhatsApp = `*🎫 PEDIDO #${numeroPedido} - SANTO LANCHE'S*\n`;
-    msgWhatsApp += `------------------------------\n`;
+    msgWhatsApp += `--------------------------------------\n`;
     msgWhatsApp += `*👤 Cliente:* ${nome}\n`;
     msgWhatsApp += `*📞 WhatsApp:* ${fone}\n`;
     msgWhatsApp += `*🛵 Entrega:* ${tipoEntrega === 'entrega' ? 'Sim' : 'Não (Retirada)'}\n`;
-    if(tipoEntrega === 'entrega') msgWhatsApp += `*📍 Endereço:* ${endereco}\n`;
-    const pgtoTexto = formaPagamento === 'pix' ? 'PIX (Comprovante em anexo ⏳)' : formaPagamento.toUpperCase();
-    msgWhatsApp += `*💳 Pagamento:* ${pgtoTexto}\n\n*🛒 ITENS:*\n`;
-    carrinho.forEach(item => { msgWhatsApp += `✅ ${item.nome} - R$ ${parseFloat(item.preco).toFixed(2)}\n`; });
-    if(observacao) msgWhatsApp += `\n*📝 Obs:* ${observacao}\n`;
-    msgWhatsApp += `\n*💰 TOTAL: R$ ${totalCarrinho.toFixed(2)}*`;
+    
+    if(tipoEntrega === 'entrega') {
+        msgWhatsApp += `*📍 Endereço:* ${endereco}\n`;
+    }
+    
+    const pgtoTexto = formaPagamento === 'pix' ? 'PIX (Comprovante em anexo ❖)' : formaPagamento.toUpperCase();
+    msgWhatsApp += `*💳 Pagamento:* ${pgtoTexto}\n`;
+    msgWhatsApp += `--------------------------------------\n`;
+    msgWhatsApp += `*🛒 ITENS:*\n`;
+    
+    carrinho.forEach(item => { 
+        msgWhatsApp += `✅ ${item.nome} - R$ ${parseFloat(item.preco).toFixed(2)}\n`; 
+    });
+    
+    if(observacao) {
+        msgWhatsApp += `\n*📝 Obs:* ${observacao}\n`;
+    }
+    
+    msgWhatsApp += `--------------------------------------\n`;
+    msgWhatsApp += `*💰 TOTAL: R$ ${totalCarrinho.toFixed(2)}*`;
 
     const novoPedido = {
         id: pedidoId,
@@ -147,28 +209,54 @@ window.confirmarPedido = async function() {
         total: totalCarrinho,
         status: 'pendente',
         hora: new Date().toLocaleTimeString(),
-        data: new Date().toLocaleDateString()
+        data: new Date().toLocaleDateString('pt-BR')
     };
 
     try {
+        // Salva no Banco de Dados
         await addDoc(collection(db, "pedidosRecebidos"), novoPedido);
+        
+        // Envia para o WhatsApp
         const meuWhatsapp = "5538988287076"; 
         window.open(`https://api.whatsapp.com/send?phone=${meuWhatsapp}&text=${encodeURIComponent(msgWhatsApp)}`, '_blank');
         
-        alert(`Pedido #${numeroPedido} enviado com sucesso!`);
+        window.mostrarAviso("Sucesso!", `Pedido #${numeroPedido} enviado com sucesso!`, "✅");
+        
+        // Limpa carrinho e fecha modal
         carrinho = [];
         document.getElementById('qtd-itens').innerText = "0 Itens";
         document.getElementById('valor-total').innerText = "R$ 0,00";
-        fecharModal();
+        window.fecharModal();
+        
+        // Reinicia após 3 segundos para limpar os inputs
+        setTimeout(() => location.reload(), 3000);
     } catch (e) {
-        alert("Erro ao salvar pedido online.");
+        window.mostrarAviso("Erro", "Não conseguimos enviar seu pedido. Tente novamente.", "❌");
     }
-}
+};
+
+// --- 5. EVENTOS ---
+window.toggleEndereco = function() {
+    const tipo = document.getElementById('tipo-entrega').value;
+    const secao = document.getElementById('secao-endereco');
+    if(secao) secao.style.display = tipo === 'entrega' ? 'block' : 'none';
+};
+
+window.gerenciarPagamentoPix = function() {
+    const formaPagamento = document.getElementById('pagamento').value;
+    const areaPix = document.getElementById('area-pix');
+    if (formaPagamento === 'pix') {
+        window.mostrarAviso("Pagamento PIX", `Chave: ${dadosPix.chave}\nNome: ${dadosPix.nome}`, "💎");
+        if(areaPix) areaPix.style.display = 'block';
+    } else {
+        if(areaPix) areaPix.style.display = 'none';
+    }
+};
 
 document.addEventListener('DOMContentLoaded', () => {
-    carregarCardapio();
     const selectPagamento = document.getElementById('pagamento');
     if(selectPagamento) selectPagamento.addEventListener('change', window.gerenciarPagamentoPix);
+    
     const selectEntrega = document.getElementById('tipo-entrega');
     if(selectEntrega) selectEntrega.addEventListener('change', window.toggleEndereco);
 });
