@@ -95,7 +95,7 @@ function renderizarProdutos() {
                 <p class="preco">R$ ${parseFloat(p.preco).toFixed(2)}</p>
             </div>
             <div class="acoes-card-prod">
-                <button onclick="window.abrirModalEdicao('${p.docId}')">✏️ Editar</button>
+                <button onclick="window.abrirModalEdicao('${p.docId}')">🖋 Editar</button>
                 <button onclick="window.removerProduto('${p.docId}')">❌ Excluir</button>
             </div>
         </div>
@@ -135,20 +135,19 @@ form.addEventListener('submit', async (e) => {
     
     // Pegando os valores dos campos
     const nome = document.getElementById('prod-nome').value;
-    const categoria = document.getElementById('prod-categoria').value;
+    const categoria = document.getElementById('prod-categoria').value.trim();
     const preco = parseFloat(document.getElementById('prod-preco').value);
     const desc = document.getElementById('prod-desc').value;
     const promo = document.getElementById('prod-promo').checked;
 
-    const novoProd = {
-        nome: nome,
-        categoria: categoria, // Verifique se no seu script.js do cliente está escrito 'categoria'
-        preco: preco,
-        desc: desc || "",
-        emPromocao: promo,
-        disponivel: true, // Adicionei isso caso seu cardápio filtre por produtos disponíveis
-        dataCriacao: new Date().toISOString()
-    };
+  const novoProduto = {
+    nome: nome,
+    categoria: categoria, // O Firebase vai salvar o texto exato que você digitou ou selecionou
+    preco: preco,
+    desc: desc,
+    emPromocao: promo,
+    disponivel: true
+};
 
     try {
         await addDoc(collection(db, "produtosCardapio"), novoProd);
@@ -213,7 +212,7 @@ window.imprimirPedido = function(docId) {
             </head>
             <body>
                 <div class="center">
-                    <h2 style="margin:0">BURGUER MANIA</h2>
+                    <h2 style="margin:0">SANTO LANCHE'S</h2>
                     <div class="numero">#${ped.numero || ped.id.toString().slice(-4)}</div>
                     <p>${ped.data || ''} - ${ped.hora}</p>
                 </div>
@@ -262,7 +261,7 @@ window.removerPedido = async (docId) => confirm("Apagar do histórico?") && awai
 
 window.avisarCliente = function(docId) {
     const ped = pedidos.find(p => p.docId === docId);
-    const msg = `Olá ${ped.cliente}, seu pedido #${ped.numero} está pronto e saindo para você!`;
+    const msg = `Olá ${ped.cliente}, seu pedido #${ped.numero} está pronto e saiu para entregar!`;
     window.open(`https://api.whatsapp.com/send?phone=55${ped.telefone.replace(/\D/g, '')}&text=${encodeURIComponent(msg)}`);
 };
 
