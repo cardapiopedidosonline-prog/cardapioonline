@@ -40,18 +40,35 @@ function carregarCardapio() {
         return;
     }
 
-    container.innerHTML = produtosLoja.map(p => `
-        <div class="produto">
-            <div class="prod-info">
-                <h3>${p.nome}</h3>
-                <p>${p.desc || 'Delicioso hambúrguer artesanal'}</p>
-                <span>R$ ${parseFloat(p.preco).toFixed(2)}</span>
+    // Ordena para que os itens em promoção apareçam primeiro (no topo)
+    const produtosOrdenados = [...produtosLoja].sort((a, b) => {
+        return (b.emPromocao === true ? 1 : 0) - (a.emPromocao === true ? 1 : 0);
+    });
+
+    container.innerHTML = produtosOrdenados.map(p => {
+        // Estilo especial se estiver em promoção
+        const estiloPromo = p.emPromocao 
+            ? 'border: 2px solid #f59e0b; background-color: #fffbeb; position: relative;' 
+            : '';
+            
+        const seloPromo = p.emPromocao 
+            ? `<span style="background: #f59e0b; color: white; padding: 2px 8px; border-radius: 50px; font-size: 0.7rem; font-weight: bold; display: inline-block; margin-bottom: 5px;">PROMOÇÃO 🔥</span>` 
+            : '';
+
+        return `
+            <div class="produto" style="${estiloPromo}">
+                <div class="prod-info">
+                    ${seloPromo}
+                    <h3>${p.nome}</h3>
+                    <p>${p.desc || 'Delicioso hambúrguer artesanal'}</p>
+                    <span>R$ ${parseFloat(p.preco).toFixed(2)}</span>
+                </div>
+                <button onclick="adicionarAoCarrinho('${p.nome}', ${p.preco})">
+                    Adicionar
+                </button>
             </div>
-            <button onclick="adicionarAoCarrinho('${p.nome}', ${p.preco})">
-                Adicionar
-            </button>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 window.adicionarAoCarrinho = function(nome, preco) {
@@ -105,7 +122,7 @@ window.confirmarPedido = async function() {
     const pedidoId = Date.now();
     const numeroPedido = pedidoId.toString().slice(-4);
 
-    let msgWhatsApp = `*🎫 PEDIDO #${numeroPedido} - BURGUER MANIA*\n`;
+    let msgWhatsApp = `*🎫 PEDIDO #${numeroPedido} - SANTO LANCHE'S*\n`;
     msgWhatsApp += `------------------------------\n`;
     msgWhatsApp += `*👤 Cliente:* ${nome}\n`;
     msgWhatsApp += `*📞 WhatsApp:* ${fone}\n`;
