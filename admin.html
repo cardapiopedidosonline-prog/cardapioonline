@@ -5,6 +5,105 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Controle de Pedidos</title>
     <link rel="stylesheet" href="admin-style.css">
+    <style>
+        /* Estilos para o Modal de Edição Personalizado */
+        .modal-personalizado {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-conteudo-dark {
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header-dark {
+            background-color: #0f172a;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+        }
+
+        .modal-header-dark h4 { color: #f8fafc; margin: 0; }
+
+        .fechar-modal-dark {
+            color: #94a3b8;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .modal-corpo-dark { padding: 20px; }
+
+        .modal-corpo-dark label {
+            display: block;
+            color: #94a3b8;
+            margin-bottom: 5px;
+            font-size: 0.8rem;
+        }
+
+        .modal-corpo-dark input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            color: white;
+        }
+
+        .secao-promo-dark {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(245, 158, 11, 0.1);
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            margin-bottom: 20px;
+        }
+
+        .secao-promo-dark label { color: #f59e0b; margin: 0; font-weight: bold; }
+
+        .btn-salvar-dark {
+            width: 100%;
+            padding: 12px;
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* Destaque para cards em promoção na lista */
+        .card-produto-promo {
+            border: 2px solid #f59e0b !important;
+            position: relative;
+        }
+        
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            color: #f1f5f9;
+            font-size: 0.9rem;
+        }
+    </style>
 </head>
 <body>
 
@@ -45,6 +144,12 @@
                         <label>Descrição</label>
                         <textarea id="prod-desc"></textarea>
                     </div>
+
+                    <div class="checkbox-row">
+                        <input type="checkbox" id="prod-promo" style="width: auto;">
+                        <label for="prod-promo">Destacar como PROMOÇÃO 🔥</label>
+                    </div>
+
                     <button type="submit" class="btn-salvar">Salvar no Cardápio</button>
                 </form>
             </div>
@@ -65,6 +170,31 @@
         </div>
     </section>
 </main>
+
+<div id="modal-edicao" class="modal-personalizado" style="display: none;">
+    <div class="modal-conteudo-dark">
+        <div class="modal-header-dark">
+            <h4>✏️ Editar Produto</h4>
+            <span class="fechar-modal-dark" onclick="window.fecharModalEdicao()">&times;</span>
+        </div>
+        <div class="modal-corpo-dark">
+            <input type="hidden" id="edit-docId">
+            
+            <label>Nome do Produto</label>
+            <input type="text" id="edit-nome">
+            
+            <label>Preço (R$)</label>
+            <input type="number" id="edit-preco" step="0.01">
+            
+            <div class="secao-promo-dark">
+                <input type="checkbox" id="edit-promo" style="width: auto;">
+                <label for="edit-promo">ATIVAR PROMOÇÃO 🔥</label>
+            </div>
+            
+            <button class="btn-salvar-dark" onclick="window.confirmarEdicao()">Salvar Alterações</button>
+        </div>
+    </div>
+</div>
 
 <script type="module" src="admin-script.js"></script>
 </body>
