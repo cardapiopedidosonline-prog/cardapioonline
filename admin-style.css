@@ -1,0 +1,251 @@
+/* --- BURGUER MANIA PRO DASHBOARD (ESTILO CARDS HORIZONTAIS) --- */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap');
+
+:root {
+    --bg-app: #0f172a;          
+    --bg-card: #1e293b;         
+    --bg-input: #334155;        
+    --primary: #3b82f6;         
+    --primary-glow: rgba(59, 130, 246, 0.5);
+    --success: #10b981;         
+    --danger: #ef4444;          
+    --text-main: #f1f5f9;       
+    --text-muted: #94a3b8;      
+    --shadow-main: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+}
+
+body { 
+    font-family: 'Poppins', sans-serif; 
+    background-color: var(--bg-app); 
+    margin: 0; padding: 20px; color: var(--text-main);
+}
+
+/* --- ESTRUTURA DASHBOARD --- */
+header { 
+    display: flex; justify-content: space-between; align-items: center; 
+    max-width: 1300px; margin: 0 auto 30px; 
+    background: var(--bg-card); padding: 15px 25px; 
+    border-radius: 16px; box-shadow: var(--shadow-main);
+}
+
+.nav-admin { display: flex; gap: 8px; background: rgba(0,0,0,0.2); padding: 4px; border-radius: 12px; }
+
+.btn-nav { 
+    padding: 10px 20px; border-radius: 10px; border: none; cursor: pointer;
+    font-weight: 600; color: var(--text-muted); background: transparent; transition: 0.3s;
+}
+
+.btn-nav.active { background: var(--primary); color: white; box-shadow: 0 0 15px var(--primary-glow); }
+
+.container { max-width: 1300px; margin: 0 auto; }
+.grid-admin { display: grid; grid-template-columns: 350px 1fr; gap: 30px; }
+.card { background: var(--bg-card); padding: 25px; border-radius: 20px; box-shadow: var(--shadow-main); border: 1px solid rgba(255, 255, 255, 0.05); }
+
+/* --- FORMULÁRIO --- */
+.campo { margin-bottom: 15px; }
+.campo label { font-weight: 600; font-size: 0.75rem; text-transform: uppercase; color: var(--primary); margin-bottom: 8px; display: block; }
+.campo input, .campo select, .campo textarea {
+    background: var(--bg-input); border: 2px solid transparent; padding: 12px; 
+    border-radius: 12px; width: 100%; color: white; transition: 0.3s; font-family: inherit;
+}
+.campo input:focus { border-color: var(--primary); outline: none; }
+
+.btn-salvar {
+    width: 100%; padding: 15px; background: var(--primary); color: white;
+    border: none; border-radius: 12px; font-weight: 700; cursor: pointer; 
+    box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3); transition: 0.3s;
+}
+
+/* ============================================================
+   AQUI ESTÁ O SEGREDO: O CONTAINER DOS PRODUTOS
+   ============================================================ */
+#tabela-produtos {
+    display: grid !important; /* Força o uso de Grid */
+    /* Cria colunas de 200px lado a lado. O 'auto-fill' coloca quantos couberem na horizontal */
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important; 
+    gap: 15px;
+    padding: 10px 0;
+    align-items: start;
+}
+
+/* O CARD INDIVIDUAL */
+.card-produto {
+    background: #1e293b;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    min-height: 180px;
+    transition: 0.3s;
+}
+
+.card-produto:hover {
+    border-color: var(--primary);
+    transform: translateY(-3px);
+}
+
+.card-produto .categoria {
+    font-size: 0.65rem;
+    color: var(--primary);
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.card-produto h3 {
+    margin: 5px 0;
+    font-size: 1rem;
+    color: white;
+}
+
+.card-produto .preco {
+    font-size: 1.1rem;
+    color: var(--success);
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+
+.acoes-card-prod {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.acoes-card-prod button {
+    padding: 8px;
+    font-size: 0.75rem;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.btn-editar-prod { background: rgba(59, 130, 246, 0.1); color: var(--primary); border: 1px solid var(--primary) !important; }
+.btn-excluir-prod { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+
+.btn-editar-prod:hover { background: var(--primary); color: white; }
+.btn-excluir-prod:hover { background: var(--danger); color: white; }
+
+/* --- ESTILO DOS CARDS DE PEDIDO --- */
+
+/* --- CONTAINER DE GESTÃO DE PEDIDOS --- */
+.pedido-card {
+    background: var(--bg-card);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 15px;
+    display: flex; /* Alinha conteúdo e botões lado a lado */
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+}
+
+/* DESTAQUE DE NOVO PEDIDO */
+.pedido-novo {
+    border-left: 6px solid var(--danger);
+    background: linear-gradient(90deg, rgba(239, 68, 68, 0.08) 0%, var(--bg-card) 100%);
+    animation: glow-red 2s infinite;
+}
+
+@keyframes glow-red {
+    0% { box-shadow: 0 0 5px rgba(239, 68, 68, 0.2); }
+    50% { box-shadow: 0 0 15px rgba(239, 68, 68, 0.4); }
+    100% { box-shadow: 0 0 5px rgba(239, 68, 68, 0.2); }
+}
+
+/* TEXTOS DO PEDIDO */
+.pedido-info h4 {
+    margin: 0;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.pedido-detalhes {
+    margin: 8px 0;
+    color: var(--text-main);
+    font-weight: 600;
+}
+
+.pedido-total {
+    color: var(--success);
+    font-weight: 800;
+    font-size: 1.1rem;
+}
+
+/* --- GRUPO DE BOTÕES MODERNOS --- */
+.acoes-pedidos {
+    display: flex;
+    gap: 8px;
+}
+
+.acoes-pedidos button {
+    border: none;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: 0.2s;
+    background: white; /* Cor base conforme imagem */
+    color: #334155;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Botão Imprimir */
+.btn-imprimir:hover { background: #f1f5f9; transform: translateY(-2px); }
+
+/* Botão Concluir (Destaque Verde) */
+.btn-concluir {
+    background: #10b981 !important;
+    color: white !important;
+}
+.btn-concluir:hover { background: #059669 !important; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3); }
+
+/* Botão Remover */
+.btn-remover:hover { background: #fee2e2; color: var(--danger); }
+
+
+/* Ajuste para ícones (emojis ou icon-fonts) */
+.acoes-pedidos span { font-size: 1rem; }
+.pedido-novo { border-left: 6px solid var(--danger); background: linear-gradient(to right, rgba(239, 68, 68, 0.05), #1e293b); }
+
+/* Media Query para telas de celular (até 768px) */
+@media (max-width: 768px) {
+    
+    /* 1. Faz os botões ficarem um embaixo do outro no celular */
+    .acoes-pedidos {
+        display: flex;
+        flex-direction: column; /* Empilha os botões verticalmente */
+        gap: 10px;
+        width: 100%;
+        margin-top: 15px;
+    }
+
+    /* 2. Faz cada botão ocupar a largura total disponível */
+    .acoes-pedidos button {
+        width: 100%;
+        justify-content: center; /* Centraliza o ícone e o texto dentro do botão */
+        padding: 12px;
+        font-size: 0.9rem;
+    }
+
+    /* 3. Ajusta o card do pedido para não apertar as informações */
+    .pedido-card {
+        flex-direction: column; /* Info em cima, botões embaixo */
+        align-items: flex-start;
+        padding: 15px;
+    }
+
+    /* 4. Ajusta o título do painel para não quebrar */
+    .painel-header h1 {
+        font-size: 1.5rem;
+    }
+}

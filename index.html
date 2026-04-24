@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cardápio Digital - Burguer Mania</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header class="loja-header">
+       <img src="logo.png" alt="Logo Burguer Mania" class="logo-img">
+    <h1 class="titulo-cardapio">CARDÁPIO</h1>
+    <p class="boas-vindas"> Seja bem-vindo ao Santo Lanche's! Difícil vai ser não pedir de novo.</p>
+    <div class="redes-sociais">
+        <a href="https://instagram.com/seuperfil" target="_blank"><span>🅾</span> @Cardapio_teste</a>
+        <a href="https://wa.me/5538988287076" target="_blank"><span>✆</span> WhatsApp</a>
+    </div>
+       
+    </header>
+
+    <nav class="categorias" id="categorias-nav"></nav>
+
+    <main id="cardapio-container"></main>
+
+    <div id="modal-checkout" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h2>Finalizar Pedido</h2>
+            
+            <div class="form-group">
+                <label>Seu Nome:</label>
+                <input type="text" id="cliente-nome" placeholder="Como te chamamos?" required>
+            </div>
+
+            <div class="form-group">
+                <label>Seu WhatsApp (com DDD):</label>
+                <input type="tel" id="cliente-fone" placeholder="Ex: 38999999999" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Como prefere?</label>
+                <select id="tipo-entrega" onchange="toggleEndereco()">
+                    <option value="entrega">🛵 Entrega</option>
+                    <option value="retirada">🥡 Retirada no Local</option>
+                </select>
+            </div>
+
+            <div id="secao-endereco">
+                <div class="form-group">
+                    <label>Endereço Completo:</label>
+                    <input type="text" id="cliente-endereco" placeholder="Rua, número, bairro">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Forma de Pagamento:</label>
+                <select id="pagamento">
+                    <option value="">Selecione...</option>
+                    <option value="pix">Pix ❖</option>
+                    <option value="Cartão">Cartão ▬ </option>
+                    <option value="Dinheiro">Dinheiro ⛀</option>
+                </select>
+            </div>
+
+            <div id="area-pix" style="display: none; background: #e0f2fe; padding: 15px; border-radius: 12px; margin-top: 10px; border: 1px solid #7dd3fc;">
+                <p style="margin: 0; font-size: 0.8rem; color: #0369a1; font-weight: bold;">Chave PIX (Copia e Cola):</p>
+                <code style="display: block; background: white; padding: 8px; margin: 8px 0; border-radius: 6px; font-size: 0.75rem; border: 1px dashed #7dd3fc; text-align: center;">seu-email-ou-cpf@pix.com</code>
+                <small style="color: #0c4a6e; font-size: 0.7rem; display: block; text-align: center;">Titular: Burguer Mania Ltda</small>
+            </div>
+
+            <div class="form-group" style="margin-top: 15px;">
+                <label>Observações do Pedido:</label>
+                <textarea id="cliente-obs" 
+                    placeholder="Ex: Sem cebola, tirar tomate..." rows="3" 
+                    style="width: 100%; border-radius: 8px; border: 1px solid #ddd; padding: 10px; font-family: inherit; box-sizing: border-box;"></textarea>
+            </div>
+
+            <div class="modal-actions" style="margin-top: 20px; display: flex; gap: 10px;">
+                <button onclick="fecharModal()" class="btn-cancelar" style="flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #ddd; cursor: pointer;">Voltar</button>
+                <button onclick="confirmarPedido()" class="btn-confirmar" style="flex: 2; padding: 12px; border-radius: 8px; background: #25d366; color: white; border: none; font-weight: 700; cursor: pointer;">Enviar Pedido </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="carrinho-fixo">
+        <div class="total-info">
+            <span id="qtd-itens">0 Itens</span>
+            <span id="valor-total">R$ 0,00</span>
+        </div>
+        <button id="finalizar-btn" onclick="abrirModal()">Ver Carrinho</button>
+    </div>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>

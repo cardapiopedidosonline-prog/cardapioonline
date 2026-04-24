@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Controle de Pedidos</title>
+    <link rel="stylesheet" href="admin-style.css">
+</head>
+<body>
+
+<header>
+    <h1>Painel de Cadastros e Pedidos</h1>
+    <div class="nav-admin">
+        <button onclick="alternarTela('produtos')" class="btn-nav">Produtos</button>
+        <button onclick="alternarTela('pedidos')" class="btn-nav">
+            Pedidos <span id="badge-pedidos" class="badge-alerta"></span>
+        </button>
+    </div>
+    <a href="index.html" class="btn-ver-loja">Ver Cardápio</a>
+</header>
+
+<main class="container">
+    <section id="tela-produtos">
+        <div class="grid-admin">
+            <div class="card">
+                <h2>Cadastrar Produto</h2>
+                <form id="form-cadastro">
+                    <div class="campo">
+                        <label>Nome</label>
+                        <input type="text" id="prod-nome" required>
+                    </div>
+                    <div class="campo">
+                        <label>Categoria</label>
+                        <select id="prod-categoria">
+                            <option value="Hamburgueres">hamburgueres</option>
+                            <option value="Bebidas">Bebidas</option>
+                            <option value="Salgados">Salgados</option>
+                        </select>
+                    </div>
+                    <div class="campo">
+                        <label>Preço</label>
+                        <input type="number" step="0.01" id="prod-preco" required>
+                    </div>
+                    <div class="campo">
+                        <label>Descrição</label>
+                        <textarea id="prod-desc"></textarea>
+                    </div>
+                    <button type="submit" class="btn-salvar">Salvar no Cardápio</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>Produtos Ativos</h2>
+                <div id="tabela-produtos">
+                    </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="tela-pedidos" style="display: none;">
+        <div class="card">
+            <h2>🛒 painel de Pedidos</h2>
+            <div id="lista-pedidos-recebidos">
+                </div>
+        </div>
+    </section>
+</main>
+
+<script type="module" src="admin-script.js"></script>
+</body>
+</html>
