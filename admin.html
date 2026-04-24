@@ -151,14 +151,32 @@
                         <label>Nome</label>
                         <input type="text" id="prod-nome" required>
                     </div>
-                    <div class="campo">
-                        <label>Categoria</label>
-                        <select id="prod-categoria">
-                            <option value="Hamburgueres">hamburgueres</option>
-                            <option value="Bebidas">Bebidas</option>
-                            <option value="Salgados">Salgados</option>
-                        </select>
-                    </div>
+                    <div class="form-group">
+    <label style="color: #2b77e2; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 8px;">
+        Categoria:
+    </label>
+   <input type="text" id="prod-categoria" list="lista-categorias" placeholder="Ex: Hambúrgueres, Bebidas..." required
+           style="width: 100%; 
+                  background-color: #384864; 
+                  color: #f1f5f9; 
+                  border: 1px solid #334155; 
+                  padding: 12px 15px; 
+                  border-radius: 7px; 
+                  font-family: inherit; 
+                  box-sizing: border-box; 
+                  transition: border-color 0.2s;
+                  outline: none;">
+    
+    <datalist id="lista-categorias">
+        <option value="Hambúrgueres">
+        <option value="Combos">
+        <option value="Porções">
+        <option value="Bebidas">
+        <option value="Sobremesas">
+        <option value="Adicionais">
+    </datalist>
+    <small style="color: #94a3b8; font-size: 0.75rem;"></small>
+</div>
                     <div class="campo">
                         <label>Preço</label>
                         <input type="number" step="0.01" id="prod-preco" required>
@@ -197,7 +215,7 @@
 <div id="modal-edicao" class="modal-personalizado" style="display: none;">
     <div class="modal-conteudo-dark">
         <div class="modal-header-dark">
-            <h4>✏️ Editar Produto</h4>
+            <h4>🖍 Editar Produto</h4>
             <span class="fechar-modal-dark" onclick="window.fecharModalEdicao()">&times;</span>
         </div>
         <div class="modal-corpo-dark">
