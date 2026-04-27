@@ -104,41 +104,46 @@ function carregarCardapio() {
     });
 
     container.innerHTML = produtosOrdenados.map(p => {
-        // Lógica de disponibilidade
         const estaDisponivel = p.disponivel !== false;
         
+        // Estilo do Card: Agora com altura mínima e flexbox vertical
         const estiloCard = p.emPromocao 
             ? 'border: 2px solid #f59e0b; background-color: #fffbeb;' 
             : 'background-color: white;';
             
-        // Se estiver esgotado, aplica filtro cinza e opacidade
         const filtroEsgotado = !estaDisponivel ? 'filter: grayscale(1); opacity: 0.6;' : '';
 
-        const seloPromo = p.emPromocao 
-            ? `<span style="background: #f59e0b; color: white; padding: 2px 8px; border-radius: 50px; font-size: 0.7rem; font-weight: bold; display: inline-block; margin-bottom: 5px;">PROMOÇÃO 🔥</span>` 
-            : '';
-
         return `
-            <div class="produto" style="${estiloCard} ${filtroEsgotado} padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; color: #1e293b; position: relative;">
-                <div class="prod-info" style="flex: 1;">
-                    ${seloPromo}
-                    <h3 style="margin: 0; color: #0f172a;">${p.nome}</h3>
-                    <p style="font-size: 0.9rem; color: #64748b; margin: 5px 0;">${p.desc || ''}</p>
-                    <span style="font-weight: bold; color: #10b981; font-size: 1.1rem;">R$ ${parseFloat(p.preco).toFixed(2)}</span>
-                    ${!estaDisponivel ? '<br><b style="color: #ef4444; font-size: 0.8rem;">PRODUTO ESGOTADO 📦</b>' : ''}
-                </div>
-                
-                ${estaDisponivel ? `
-                    <button onclick="adicionarAoCarrinho('${p.nome}', ${p.preco})" style="background: #ef4444; color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-left: 10px;">
-                        +
-                    </button>
-                ` : `
-                    <button disabled style="background: #64748b; color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: not-allowed; font-weight: bold; margin-left: 10px;">
-                        ❌
-                    </button>
-                `}
+    <div class="produto" style="${estiloCard} ${filtroEsgotado}">
+        <div class="prod-info">
+            ${p.emPromocao ? `<span style="background: #f59e0b; color: white; padding: 2px 8px; border-radius: 50px; font-size: 0.6rem; font-weight: bold; display: inline-block; margin-bottom: 5px;">PROMOÇÃO 🔥</span>` : ''}
+            
+            <h3>${p.nome}</h3>
+            
+            <p title="${p.desc || ''}">
+                ${p.desc ? p.desc : 'Ingredientes não informados'}
+            </p>
+        </div>
+
+        <div class="prod-footer">
+            <div style="flex-shrink: 0;">
+                <span style="color: #10b981; font-weight: 800; font-size: 1rem; white-space: nowrap;">
+                    R$ ${parseFloat(p.preco).toFixed(2)}
+                </span>
             </div>
-        `;
+
+            ${estaDisponivel ? `
+                <button onclick="adicionarAoCarrinho('${p.nome}', ${p.preco})" style="margin:0; padding: 8px 10px; font-size: 0.7rem; width: auto; flex-grow: 1; max-width: 90px;">
+                     +
+                </button>
+            ` : `
+                <button disabled class="btn-esgotado" style="margin:0; padding: 8px 5px; font-size: 0.6rem; width: auto;">
+                    INDISPONÍVEL
+                </button>
+            `}
+        </div>
+    </div>
+`;
     }).join('');
 }
 
