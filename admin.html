@@ -3,7 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Controle de Pedidos</title>
+    <title>Admin - Santo Lanche's</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icon-192.png">
+
     <link rel="stylesheet" href="admin-style.css">
     <style>
         /* Estilos para o Modal de Edição Personalizado */
@@ -103,6 +110,12 @@
             color: #f1f5f9;
             font-size: 0.9rem;
         }
+
+        /* Ajuste do campo categoria para o tema */
+        #prod-categoria::placeholder {
+            color: #94a3b8;
+            opacity: 0.7;
+        }
     </style>
 </head>
 <body>
@@ -116,7 +129,7 @@
         </div>
     </div>
     <div class="nav-admin">
-        <button onclick="alternarTela('produtos')" class="btn-nav">Produtos</button>
+        <button onclick="alternarTela('produtos')" class="btn-nav active">Produtos</button>
         <button onclick="alternarTela('pedidos')" class="btn-nav">
             Pedidos <span id="badge-pedidos" class="badge-alerta"></span>
         </button>
@@ -149,46 +162,44 @@
                 <form id="form-cadastro">
                     <div class="campo">
                         <label>Nome</label>
-                        <input type="text" id="prod-nome" required>
+                        <input type="text" id="prod-nome" required placeholder="Nome do lanche">
                     </div>
-                    <div class="form-group">
-    <label style="color: #2b77e2; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 8px;">
-        Categoria:
-    </label>
-   <input type="text" id="prod-categoria" list="lista-categorias" placeholder="Ex: Hambúrgueres, Bebidas..." required
-           style="width: 100%; 
-                  background-color: #384864; 
-                  color: #f1f5f9; 
-                  border: 1px solid #334155; 
-                  padding: 12px 15px; 
-                  border-radius: 7px; 
-                  font-family: inherit; 
-                  box-sizing: border-box; 
-                  transition: border-color 0.2s;
-                  outline: none;">
-    
-    <datalist id="lista-categorias">
-        <option value="Hambúrgueres">
-        <option value="Combos">
-        <option value="Porções">
-        <option value="Bebidas">
-        <option value="Sobremesas">
-        <option value="Adicionais">
-    </datalist>
-    <small style="color: #94a3b8; font-size: 0.75rem;"></small>
-</div>
+                    
+                    <div class="campo" style="margin-bottom: 15px;">
+                        <label>Categoria</label>
+                        <input type="text" id="prod-categoria" list="lista-categorias" placeholder="Escolha ou digite..." required
+                               style="width: 100%; 
+                                      background-color: #0f172a; 
+                                      color: #f1f5f9; 
+                                      border: 1px solid #334155; 
+                                      padding: 12px 15px; 
+                                      border-radius: 8px; 
+                                      font-family: inherit; 
+                                      box-sizing: border-box; 
+                                      outline: none;">
+                        
+                        <datalist id="lista-categorias">
+                            <option value="Hambúrgueres">
+                            <option value="Combos">
+                            <option value="Porções">
+                            <option value="Bebidas">
+                            <option value="Sobremesas">
+                            <option value="Adicionais">
+                        </datalist>
+                    </div>
+
                     <div class="campo">
                         <label>Preço</label>
-                        <input type="number" step="0.01" id="prod-preco" required>
+                        <input type="number" step="0.01" id="prod-preco" required placeholder="0,00">
                     </div>
                     <div class="campo">
                         <label>Descrição</label>
-                        <textarea id="prod-desc"></textarea>
+                        <textarea id="prod-desc" placeholder="Ingredientes e detalhes..."></textarea>
                     </div>
 
                     <div class="checkbox-row">
-                        <input type="checkbox" id="prod-promo" style="width: auto;">
-                        <label for="prod-promo">Destacar como PROMOÇÃO 🔥</label>
+                        <input type="checkbox" id="prod-promo" style="width: auto; cursor: pointer;">
+                        <label for="prod-promo" style="cursor: pointer;">Destacar como PROMOÇÃO 🔥</label>
                     </div>
 
                     <button type="submit" class="btn-salvar">Salvar no Cardápio</button>
@@ -205,7 +216,7 @@
 
     <section id="tela-pedidos" style="display: none;">
         <div class="card">
-            <h2>🛒 painel de Pedidos</h2>
+            <h2>🛒 Painel de Pedidos</h2>
             <div id="lista-pedidos-recebidos">
                 </div>
         </div>
@@ -228,8 +239,8 @@
             <input type="number" id="edit-preco" step="0.01">
             
             <div class="secao-promo-dark">
-                <input type="checkbox" id="edit-promo" style="width: auto;">
-                <label for="edit-promo">ATIVAR PROMOÇÃO 🔥</label>
+                <input type="checkbox" id="edit-promo" style="width: auto; cursor: pointer;">
+                <label for="edit-promo" style="cursor: pointer;">ATIVAR PROMOÇÃO 🔥</label>
             </div>
             
             <button class="btn-salvar-dark" onclick="window.confirmarEdicao()">Salvar Alterações</button>
