@@ -144,17 +144,27 @@ body {
     height: 2.4em;
 }
 
+/* Ajuste na descrição para não ter altura fixa e permitir que o card cresça se necessário */
 .prod-info p {
     font-size: 0.75rem;
     color: #64748b;
     margin-bottom: 12px;
     line-height: 1.4;
-    /* Limita a descrição a 2 linhas */
     display: -webkit-box;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 3; /* Aumentei para 3 linhas para caber mais ingredientes */
     -webkit-box-orient: vertical;
     overflow: hidden;
-    height: 2.8em;
+    height: auto; /* Mude de 2.8em para auto */
+}
+
+/* Nova regra para o rodapé do card não quebrar */
+.prod-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 5px; /* Espaço mínimo entre preço e botão */
+    margin-top: auto;
+    width: 100%;
 }
 
 .prod-info span {
