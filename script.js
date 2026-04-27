@@ -32,7 +32,6 @@ window.mostrarAviso = function(titulo, mensagem, icone = '⚠️') {
         document.getElementById('icone-aviso').innerText = icone;
         modal.style.display = 'flex';
     } else {
-        // Fallback caso o modal não exista no HTML ainda
         alert(`${icone} ${titulo}: ${mensagem}`);
     }
 };
@@ -69,8 +68,7 @@ onSnapshot(doc(db, "configuracoes", "status"), (docSnap) => {
                 btnConfirmar.style.cursor = "not-allowed";
             }
             document.body.style.filter = "grayscale(0.8)";
-            // Avisa o cliente assim que a loja fecha
-            window.mostrarAviso("Loja Fechada", "Caro cliente! Informamos que nosso expediente se encontra ecerrado.", "⋆｡ ﾟ☁︎｡ ⋆｡ ﾟ☾ ﾟ｡ ⋆");
+            window.mostrarAviso("Loja Fechada", "Caro cliente! Informamos que nosso expediente se encontra encerrado.", "⋆｡ ﾟ☁︎｡ ⋆｡ ﾟ☾ ﾟ｡ ⋆");
         } else {
             if(btnConfirmar) {
                 btnConfirmar.disabled = false;
@@ -83,7 +81,7 @@ onSnapshot(doc(db, "configuracoes", "status"), (docSnap) => {
     }
 });
 
-// --- 3. GESTÃO DO CARDÁPIO ---
+// --- 3. GESTÃO DO CARDÁPIO (COM FILTRO DE DISPONIBILIDADE) ---
 onSnapshot(collection(db, "produtosCardapio"), (snapshot) => {
     produtosLoja = [];
     snapshot.forEach(doc => {
@@ -106,25 +104,39 @@ function carregarCardapio() {
     });
 
     container.innerHTML = produtosOrdenados.map(p => {
-        const estiloPromo = p.emPromocao 
-            ? 'border: 2px solid #f59e0b; background-color: #fffbeb; position: relative;' 
+        // Lógica de disponibilidade
+        const estaDisponivel = p.disponivel !== false;
+        
+        const estiloCard = p.emPromocao 
+            ? 'border: 2px solid #f59e0b; background-color: #fffbeb;' 
             : 'background-color: white;';
             
+        // Se estiver esgotado, aplica filtro cinza e opacidade
+        const filtroEsgotado = !estaDisponivel ? 'filter: grayscale(1); opacity: 0.6;' : '';
+
         const seloPromo = p.emPromocao 
             ? `<span style="background: #f59e0b; color: white; padding: 2px 8px; border-radius: 50px; font-size: 0.7rem; font-weight: bold; display: inline-block; margin-bottom: 5px;">PROMOÇÃO 🔥</span>` 
             : '';
 
         return `
-            <div class="produto" style="${estiloPromo} padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; color: #1e293b;">
+            <div class="produto" style="${estiloCard} ${filtroEsgotado} padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; color: #1e293b; position: relative;">
                 <div class="prod-info" style="flex: 1;">
                     ${seloPromo}
                     <h3 style="margin: 0; color: #0f172a;">${p.nome}</h3>
-                    <p style="font-size: 0.9rem; color: #64748b; margin: 5px 0;">${p.desc || 'Hambúrguer artesanal fresquinho'}</p>
+                    <p style="font-size: 0.9rem; color: #64748b; margin: 5px 0;">${p.desc || ''}</p>
                     <span style="font-weight: bold; color: #10b981; font-size: 1.1rem;">R$ ${parseFloat(p.preco).toFixed(2)}</span>
+                    ${!estaDisponivel ? '<br><b style="color: #ef4444; font-size: 0.8rem;">PRODUTO ESGOTADO 📦</b>' : ''}
                 </div>
-                <button onclick="adicionarAoCarrinho('${p.nome}', ${p.preco})" style="background: #ef4444; color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-left: 10px;">
-                    +
-                </button>
+                
+                ${estaDisponivel ? `
+                    <button onclick="adicionarAoCarrinho('${p.nome}', ${p.preco})" style="background: #ef4444; color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-left: 10px;">
+                        +
+                    </button>
+                ` : `
+                    <button disabled style="background: #64748b; color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: not-allowed; font-weight: bold; margin-left: 10px;">
+                        ❌
+                    </button>
+                `}
             </div>
         `;
     }).join('');
@@ -133,9 +145,10 @@ function carregarCardapio() {
 // --- 4. CARRINHO E PEDIDO ---
 window.adicionarAoCarrinho = function(nome, preco) {
     if (!lojaEstaAbertaNoMomento) {
-        window.mostrarAviso("Expediênte Encerrado!", "Não é possível adicionar itens.", "⋆｡ﾟ☁︎｡⋆｡ ﾟ☾ ﾟ｡⋆");
+        window.mostrarAviso("Expediente Encerrado!", "Não é possível adicionar itens.", "⋆｡ﾟ☁︎｡⋆｡ ﾟ☾ ﾟ｡⋆");
         return;
     }
+    
     carrinho.push({ nome, preco });
     document.getElementById('qtd-itens').innerText = `${carrinho.length} Itens`;
     const total = carrinho.reduce((sum, i) => sum + i.preco, 0);
@@ -149,7 +162,6 @@ window.confirmarPedido = async function() {
         return; 
     }
     
-    // Captura dos campos
     const nome = document.getElementById('cliente-nome').value.trim();
     const fone = document.getElementById('cliente-fone').value.trim();
     const tipoEntrega = document.getElementById('tipo-entrega').value;
@@ -157,7 +169,6 @@ window.confirmarPedido = async function() {
     const formaPagamento = document.getElementById('pagamento').value;
     const observacao = document.getElementById('cliente-obs').value.trim();
     
-    // --- VALIDAÇÃO DE CAMPOS OBRIGATÓRIOS ---
     if (!nome) return window.mostrarAviso("Campo Obrigatório", "Por favor, digite seu nome.", "👤");
     if (!fone) return window.mostrarAviso("Campo Obrigatório", "Informe seu WhatsApp para contato.", "📞");
     if (tipoEntrega === 'entrega' && !endereco) {
@@ -169,7 +180,6 @@ window.confirmarPedido = async function() {
     const pedidoId = Date.now();
     const numeroPedido = pedidoId.toString().slice(-4);
 
-    // --- MONTAGEM DA MENSAGEM ESTILO CUPOM (WHATSAPP) ---
     let msgWhatsApp = `*🎫 PEDIDO #${numeroPedido} - SANTO LANCHE'S*\n`;
     msgWhatsApp += `--------------------------------------\n`;
     msgWhatsApp += `*👤 Cliente:* ${nome}\n`;
@@ -213,22 +223,18 @@ window.confirmarPedido = async function() {
     };
 
     try {
-        // Salva no Banco de Dados
         await addDoc(collection(db, "pedidosRecebidos"), novoPedido);
         
-        // Envia para o WhatsApp
         const meuWhatsapp = "5538988287076"; 
         window.open(`https://api.whatsapp.com/send?phone=${meuWhatsapp}&text=${encodeURIComponent(msgWhatsApp)}`, '_blank');
         
         window.mostrarAviso("Sucesso!", `Pedido #${numeroPedido} enviado com sucesso!`, "✅");
         
-        // Limpa carrinho e fecha modal
         carrinho = [];
         document.getElementById('qtd-itens').innerText = "0 Itens";
         document.getElementById('valor-total').innerText = "R$ 0,00";
         window.fecharModal();
         
-        // Reinicia após 3 segundos para limpar os inputs
         setTimeout(() => location.reload(), 3000);
     } catch (e) {
         window.mostrarAviso("Erro", "Não conseguimos enviar seu pedido. Tente novamente.", "❌");
@@ -246,7 +252,6 @@ window.gerenciarPagamentoPix = function() {
     const formaPagamento = document.getElementById('pagamento').value;
     const areaPix = document.getElementById('area-pix');
     if (formaPagamento === 'pix') {
-        window.mostrarAviso("Pagamento PIX", `Chave: ${dadosPix.chave}\nNome: ${dadosPix.nome}`, "💎");
         if(areaPix) areaPix.style.display = 'block';
     } else {
         if(areaPix) areaPix.style.display = 'none';
