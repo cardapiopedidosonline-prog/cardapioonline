@@ -17,6 +17,25 @@ let carrinho = [];
 let produtosLoja = [];
 let lojaEstaAbertaNoMomento = true;
 
+// --- DEFINIÇÃO DA ORDEM DAS CATEGORIAS ---
+const ordemCategorias = {
+    "hambúrgueres": 1,
+    "hamburgueres": 1,
+    "lanches": 2,
+    "pastel": 3,
+    "pastéis": 3,
+    "porções": 4,
+    "porcoes": 4,
+    "batata": 4,
+    "bebidas": 5,
+    "fanta": 5,
+    "guarana": 5,
+    "guaraná": 5,
+    "cocacola": 5,
+    "adicionais": 6,
+    "combos": 7
+};
+
 const dadosPix = {
     chave: "seu-email-ou-cpf@pix.com",
     nome: "BURGUER MANIA LTDA",
@@ -81,7 +100,7 @@ onSnapshot(doc(db, "configuracoes", "status"), (docSnap) => {
     }
 });
 
-// --- 3. GESTÃO DO CARDÁPIO (COM FILTRO DE DISPONIBILIDADE) ---
+// --- 3. GESTÃO DO CARDÁPIO (COM FILTRO DE DISPONIBILIDADE E ORDENAÇÃO) ---
 onSnapshot(collection(db, "produtosCardapio"), (snapshot) => {
     produtosLoja = [];
     snapshot.forEach(doc => {
@@ -99,33 +118,66 @@ function carregarCardapio() {
         return;
     }
 
+    const imagensPadrao = {
+        "hambúrgueres": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500&auto=format&fit=crop",
+        "hamburgueres": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500&auto=format&fit=crop",
+        "lanches": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500&auto=format&fit=crop",
+        "pastel": "https://images.pexels.com/photos/15010282/pexels-photo-15010282.jpeg?auto=compress&cs=tinysrgb&w=500",
+        "pastéis": "https://images.pexels.com/photos/15010282/pexels-photo-15010282.jpeg?auto=compress&cs=tinysrgb&w=500",
+        "cocacola": "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500&auto=format&fit=crop",
+        "fanta": "https://images.pexels.com/photos/34993951/pexels-photo-34993951.jpeg?auto=compress&cs=tinysrgb&w=500",
+        "guarana": "https://images.pexels.com/photos/32183186/pexels-photo-32183186.jpeg?auto=compress&cs=tinysrgb&w=500",
+        "guaraná": "https://images.pexels.com/photos/32183186/pexels-photo-32183186.jpeg?auto=compress&cs=tinysrgb&w=500",
+        "batata": "https://images.pexels.com/photos/31533633/pexels-photo-31533633.jpeg?auto=compress&cs=tinysrgb&w=500",
+        "porções": "https://images.pexels.com/photos/31533633/pexels-photo-31533633.jpeg?auto=compress&cs=tinysrgb&w=500",
+        "adicionais": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&fit=crop",
+        "combos": "https://images.unsplash.com/photo-1513185158878-8d8c196b8965?w=500&auto=format&fit=crop",
+        "default": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop"
+    };
+
+    // ORDENAÇÃO APLICADA AQUI
     const produtosOrdenados = [...produtosLoja].sort((a, b) => {
+        const catA = a.categoria ? a.categoria.toLowerCase().trim() : "";
+        const catB = b.categoria ? b.categoria.toLowerCase().trim() : "";
+
+        const pesoA = ordemCategorias[catA] || 99;
+        const pesoB = ordemCategorias[catB] || 99;
+
+        // Primeiro critério: Ordem de importância da categoria
+        if (pesoA !== pesoB) {
+            return pesoA - pesoB;
+        }
+
+        // Segundo critério: Promoção (quem está em promoção fica no topo da sua categoria)
         return (b.emPromocao === true ? 1 : 0) - (a.emPromocao === true ? 1 : 0);
     });
 
     container.innerHTML = produtosOrdenados.map(p => {
         const estaDisponivel = p.disponivel !== false;
-        
-        // Estilo do Card: Agora com altura mínima e flexbox vertical
-        const estiloCard = p.emPromocao 
-            ? 'border: 2px solid #f59e0b; background-color: #fffbeb;' 
-            : 'background-color: white;';
-            
+        const estiloCard = p.emPromocao ? 'border: 2px solid #f59e0b; background-color: #fffbeb;' : 'background-color: white;';
         const filtroEsgotado = !estaDisponivel ? 'filter: grayscale(1); opacity: 0.6;' : '';
 
+        const categoriaLimpa = p.categoria ? p.categoria.toLowerCase().trim() : "default";
+        const fotoProduto = p.imagemUrl || imagensPadrao[categoriaLimpa] || imagensPadrao["default"];
+
         return `
-    <div class="produto" style="${estiloCard} ${filtroEsgotado}">
-        <div class="prod-info">
-            ${p.emPromocao ? `<span style="background: #f59e0b; color: white; padding: 2px 8px; border-radius: 50px; font-size: 0.6rem; font-weight: bold; display: inline-block; margin-bottom: 5px;">PROMOÇÃO 🔥</span>` : ''}
-            
-            <h3>${p.nome}</h3>
-            
-            <p title="${p.desc || ''}">
+    <div class="produto" style="${estiloCard} ${filtroEsgotado} padding: 0; overflow: hidden;">
+        <div style="width: 100%; height: 120px; position: relative; background: #f1f5f9;">
+            <img src="${fotoProduto}" 
+                 onerror="this.src='${imagensPadrao.default}'"
+                 style="width: 100%; height: 100%; object-fit: cover;" 
+                 alt="${p.nome}">
+            ${p.emPromocao ? `<span style="position: absolute; top: 8px; right: 8px; background: #f59e0b; color: white; padding: 3px 8px; border-radius: 50px; font-size: 0.55rem; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">PROMOÇÃO 🔥</span>` : ''}
+        </div>
+
+        <div class="prod-info" style="padding: 12px 12px 0 12px;">
+            <h3 style="margin: 0; font-size: 1rem; font-weight: 700; color: #1d3557;">${p.nome}</h3>
+            <p title="${p.desc || ''}" style="margin: 5px 0 10px 0;">
                 ${p.desc ? p.desc : 'Ingredientes não informados'}
             </p>
         </div>
 
-        <div class="prod-footer">
+        <div class="prod-footer" style="padding: 0 12px 12px 12px; display: flex; justify-content: space-between; align-items: center; gap: 5px;">
             <div style="flex-shrink: 0;">
                 <span style="color: #10b981; font-weight: 800; font-size: 1rem; white-space: nowrap;">
                     R$ ${parseFloat(p.preco).toFixed(2)}
@@ -133,12 +185,12 @@ function carregarCardapio() {
             </div>
 
             ${estaDisponivel ? `
-                <button onclick="adicionarAoCarrinho('${p.nome}', ${p.preco})" style="margin:0; padding: 8px 10px; font-size: 0.7rem; width: auto; flex-grow: 1; max-width: 90px;">
+                <button onclick="adicionarAoCarrinho('${p.nome}', ${p.preco})" style="margin:0; padding: 8px 10px; font-size: 1rem; width: auto; flex-grow: 1; max-width: 60px; line-height: 1;">
                      +
                 </button>
             ` : `
-                <button disabled class="btn-esgotado" style="margin:0; padding: 8px 5px; font-size: 0.6rem; width: auto;">
-                    INDISPONÍVEL
+                <button disabled style="margin:0; padding: 8px 5px; font-size: 0.6rem; width: auto; flex-grow: 1; background: #94a3b8; color: white; border: none; border-radius: 8px;">
+                    INDISP.
                 </button>
             `}
         </div>
@@ -229,7 +281,6 @@ window.confirmarPedido = async function() {
 
     try {
         await addDoc(collection(db, "pedidosRecebidos"), novoPedido);
-        
         const meuWhatsapp = "5538988287076"; 
         window.open(`https://api.whatsapp.com/send?phone=${meuWhatsapp}&text=${encodeURIComponent(msgWhatsApp)}`, '_blank');
         
