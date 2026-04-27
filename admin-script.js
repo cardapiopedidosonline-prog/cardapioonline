@@ -125,8 +125,33 @@ window.confirmarEdicao = async function() {
     } catch (e) { alert("Erro ao atualizar."); }
 };
 
-window.removerProduto = async (docId) => {
-    if(confirm("Remover do cardápio?")) await deleteDoc(doc(db, "produtosCardapio", docId));
+// 1. Função chamada pelo botão "Excluir" do card
+window.removerProduto = (id) => {
+    document.getElementById('excluir-docId').value = id;
+    document.getElementById('modal-confirmar-exclusao').style.display = 'flex';
+};
+
+// 2. Função para fechar o modal
+window.fecharModalExcluir = () => {
+    document.getElementById('modal-confirmar-exclusao').style.display = 'none';
+};
+
+// 3. Função que deleta de fato no Firebase
+window.confirmarExclusaoReal = async () => {
+    const id = document.getElementById('excluir-docId').value;
+    
+    try {
+        // Supondo que sua coleção se chame 'produtos'
+        const docRef = doc(db, "produtos", id); 
+        await deleteDoc(docRef);
+        
+        window.fecharModalExcluir();
+        exibirToast("Produto removido com sucesso! 🗑️");
+        
+    } catch (error) {
+        console.error("Erro ao remover:", error);
+        exibirToast("Erro ao remover o produto.");
+    }
 };
 
 // --- EVENTO DE CADASTRO CORRIGIDO ---
@@ -154,7 +179,22 @@ form.addEventListener('submit', async (e) => {
         // CORREÇÃO AQUI: Enviando 'novoProduto' corretamente
         await addDoc(collection(db, "produtosCardapio"), novoProduto);
         form.reset();
-        alert("Produto cadastrado com sucesso!");
+       // Substitua o alert por isso:
+const exibirToast = (mensagem) => {
+    const toast = document.getElementById('toast-sucesso');
+    const toastMsg = document.getElementById('toast-mensagem');
+    
+    toastMsg.innerText = mensagem;
+    toast.style.display = 'flex';
+
+    // Some sozinho após 3 segundos
+    setTimeout(() => {
+        toast.style.display = 'none';
+    }, 3000);
+};
+
+// Dentro da sua função de salvar, no final do sucesso:
+exibirToast("Produto cadastrado com sucesso! 🍔");
     } catch (e) { 
         console.error("Erro detalhado do Firebase:", e);
         alert("Erro ao salvar! Verifique se as Regras do Firebase estão publicadas."); 
