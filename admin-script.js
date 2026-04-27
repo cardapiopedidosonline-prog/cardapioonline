@@ -129,33 +129,35 @@ window.removerProduto = async (docId) => {
     if(confirm("Remover do cardápio?")) await deleteDoc(doc(db, "produtosCardapio", docId));
 };
 
-// Localize o evento de submit no seu admin-script.js e substitua por este:
+// --- EVENTO DE CADASTRO CORRIGIDO ---
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    // Pegando os valores dos campos
     const nome = document.getElementById('prod-nome').value;
     const categoria = document.getElementById('prod-categoria').value.trim();
     const preco = parseFloat(document.getElementById('prod-preco').value);
     const desc = document.getElementById('prod-desc').value;
     const promo = document.getElementById('prod-promo').checked;
 
-  const novoProduto = {
-    nome: nome,
-    categoria: categoria, // O Firebase vai salvar o texto exato que você digitou ou selecionou
-    preco: preco,
-    desc: desc,
-    emPromocao: promo,
-    disponivel: true
-};
+    // Criando o objeto
+    const novoProduto = {
+        nome: nome,
+        categoria: categoria,
+        preco: preco,
+        desc: desc,
+        emPromocao: promo,
+        disponivel: true,
+        dataCriacao: new Date()
+    };
 
     try {
-        await addDoc(collection(db, "produtosCardapio"), novoProd);
+        // CORREÇÃO AQUI: Enviando 'novoProduto' corretamente
+        await addDoc(collection(db, "produtosCardapio"), novoProduto);
         form.reset();
         alert("Produto cadastrado com sucesso!");
     } catch (e) { 
-        console.error("Erro ao salvar:", e);
-        alert("Erro ao salvar no Firebase. Verifique o console."); 
+        console.error("Erro detalhado do Firebase:", e);
+        alert("Erro ao salvar! Verifique se as Regras do Firebase estão publicadas."); 
     }
 });
 
@@ -190,7 +192,7 @@ function renderizarPedidos() {
     atualizarBadge();
 }
 
-// --- 7. IMPRESSÃO PROFISSIONAL (CONSERTADA) ---
+// --- 7. IMPRESSÃO PROFISSIONAL ---
 window.imprimirPedido = function(docId) {
     const ped = pedidos.find(p => p.docId === docId);
     if (!ped) return;
