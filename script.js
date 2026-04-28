@@ -199,6 +199,7 @@ function carregarCardapio() {
     }).join('');
 
     // No final do container.innerHTML, após o fechamento da lista de produtos
+// No final do container.innerHTML, após o fechamento da lista de produtos
 container.innerHTML += `
     <div style="
         text-align: center; 
@@ -232,6 +233,7 @@ container.innerHTML += `
     </div>
 `;
 }
+
 
 // --- 4. CARRINHO E PEDIDO ---
 window.adicionarAoCarrinho = function(nome, preco) {
