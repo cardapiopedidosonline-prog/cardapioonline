@@ -197,6 +197,40 @@ function carregarCardapio() {
     </div>
 `;
     }).join('');
+
+    // No final do container.innerHTML, após o fechamento da lista de produtos
+container.innerHTML += `
+    <div style="
+        text-align: center; 
+        padding: 40px 20px 20px; 
+        width: 100%; 
+        grid-column: 1/-1;
+        opacity: 0.7;
+    ">
+        <div style="
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            gap: 5px; 
+            color: #64748b; 
+            font-size: 0.45rem;
+            letter-spacing: 1px;
+        ">
+            <span style="display:inline-flex; align-items:center;">
+  <img src="logo-zuti.png" 
+       alt="Zuti Logo" 
+       style="width:70px; height:70px;">
+</span>
+            
+            <span style="display: flex; flex-direction: column; gap: 2px;">
+                <span>Desenvolvido por <strong>Zuti Informática</strong></span>
+                <a href="https://wa.me/5538988287076" target="_blank" style="text-decoration: none; color: #64748b; font-weight: bold;">
+                    ✆ (38) 98828-7076
+                </a>
+            </span>
+        </div>
+    </div>
+`;
 }
 
 // --- 4. CARRINHO E PEDIDO ---
