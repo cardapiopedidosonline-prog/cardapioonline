@@ -132,7 +132,7 @@ function carregarCardapio() {
         "porções": "https://images.pexels.com/photos/31533633/pexels-photo-31533633.jpeg?auto=compress&cs=tinysrgb&w=500",
         "adicionais": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&fit=crop",
         "combos": "https://images.unsplash.com/photo-1513185158878-8d8c196b8965?w=500&auto=format&fit=crop",
-        "default": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop"
+        "default": "https://github.com/cardapiopedidosonline-prog/cardapioonline/embreve.png"
     };
 
     // ORDENAÇÃO APLICADA AQUI
