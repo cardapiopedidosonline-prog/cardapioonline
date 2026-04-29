@@ -198,8 +198,8 @@ function carregarCardapio() {
 `;
     }).join('');
 
-    // No final do container.innerHTML, após o fechamento da lista de produtos
-// No final do container.innerHTML, após o fechamento da lista de produtos
+    
+// Logo de desenvolvedor
 container.innerHTML += `
     <div style="
         text-align: center; 
@@ -220,7 +220,7 @@ container.innerHTML += `
             <span style="display:inline-flex; align-items:center;">
   <img src="logo-zuti.png" 
        alt="Zuti Logo" 
-       style="width:70px; height:70px;">
+       style="width:50px; height:50px;">
 </span>
             
             <span style="display: flex; flex-direction: column; gap: 2px;">
